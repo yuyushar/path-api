@@ -445,7 +445,12 @@ type UpdateKelasParams struct {
 }
 
 func (q *Queries) UpdateKelas(ctx context.Context, arg UpdateKelasParams) (Kela, error) {
-	row := q.db.QueryRow(ctx, updateKelas, arg.KodeKelas, arg.Nama, arg.Deskripsi, arg.Mapel)
+	row := q.db.QueryRow(ctx, updateKelas,
+		arg.KodeKelas,
+		arg.Nama,
+		arg.Deskripsi,
+		arg.Mapel,
+	)
 	var i Kela
 	err := row.Scan(
 		&i.ID,

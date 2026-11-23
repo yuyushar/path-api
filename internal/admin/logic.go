@@ -1176,8 +1176,8 @@ func (h *Handler) ListAiUsage(c *echo.Context) error {
 	end := start.AddDate(0, 1, 0)
 
 	rows, err := h.db.ListAiUsageByPeriod(c.Request().Context(), db.ListAiUsageByPeriodParams{
-		Start: pgtype.Timestamp{Time: start, Valid: true},
-		End:   pgtype.Timestamp{Time: end, Valid: true},
+		Dibuat:   pgtype.Timestamp{Time: start, Valid: true},
+		Dibuat_2: pgtype.Timestamp{Time: end, Valid: true},
 	})
 	if err != nil {
 		log.Println(err)

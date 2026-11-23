@@ -9,7 +9,7 @@ ORDER BY p.dibuat DESC, p.id DESC;
 
 -- name: CreatePostingan :one
 INSERT INTO postingan (judul, deskripsi, lampiran, tipe_id, pengguna_id, kelas_id, tenggat_waktu)
-VALUES ($1, $2, $3, $4, $5, $6, sqlc.narg(tenggat_waktu))
+VALUES ($1, $2, $3, $4, $5, $6, sqlc.narg(tenggat_waktu)::timestamp)
 RETURNING id, judul, deskripsi, lampiran, pengguna_id, kelas_id, tipe_id, dibuat, menerima_kiriman, tenggat_waktu;
 
 -- name: UpdatePostingan :one
@@ -19,10 +19,10 @@ SET
     deskripsi = $4,
     lampiran = COALESCE($5, lampiran),
     tipe_id = $6,
-    menerima_kiriman = COALESCE(sqlc.narg(menerima_kiriman), menerima_kiriman),
+    menerima_kiriman = COALESCE(sqlc.narg(menerima_kiriman)::boolean, menerima_kiriman),
     tenggat_waktu = CASE
-        WHEN $8::boolean THEN NULL
-        ELSE COALESCE(sqlc.narg(tenggat_waktu), tenggat_waktu)
+        WHEN sqlc.arg(hapus_tenggat)::boolean THEN NULL
+        ELSE COALESCE(sqlc.narg(tenggat_waktu)::timestamp, tenggat_waktu)
     END
 WHERE id = $1 AND kelas_id = $2
 RETURNING id, judul, deskripsi, lampiran, pengguna_id, kelas_id, tipe_id, dibuat, menerima_kiriman, tenggat_waktu;

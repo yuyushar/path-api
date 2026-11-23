@@ -8,12 +8,26 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AiUsageLog struct {
+	ID         int32            `json:"id"`
+	PenggunaID int32            `json:"pengguna_id"`
+	Fitur      string           `json:"fitur"`
+	Dibuat     pgtype.Timestamp `json:"dibuat"`
+}
+
 type AnggotaKela struct {
 	ID         int32            `json:"id"`
 	PenggunaID int32            `json:"pengguna_id"`
 	KelasID    int32            `json:"kelas_id"`
 	Guru       bool             `json:"guru"`
 	Dibuat     pgtype.Timestamp `json:"dibuat"`
+}
+
+type BantuanKonten struct {
+	Kunci      string           `json:"kunci"`
+	Judul      string           `json:"judul"`
+	Isi        string           `json:"isi"`
+	Diperbarui pgtype.Timestamp `json:"diperbarui"`
 }
 
 type File struct {
@@ -31,20 +45,6 @@ type KalenderAkademik struct {
 	TanggalMulai   pgtype.Date      `json:"tanggal_mulai"`
 	TanggalSelesai pgtype.Date      `json:"tanggal_selesai"`
 	Dibuat         pgtype.Timestamp `json:"dibuat"`
-}
-
-type BantuanKonten struct {
-	Kunci      string           `json:"kunci"`
-	Judul      string           `json:"judul"`
-	Isi        string           `json:"isi"`
-	Diperbarui pgtype.Timestamp `json:"diperbarui"`
-}
-
-type AiUsageLog struct {
-	ID         int32            `json:"id"`
-	PenggunaID int32            `json:"pengguna_id"`
-	Fitur      string           `json:"fitur"`
-	Dibuat     pgtype.Timestamp `json:"dibuat"`
 }
 
 type Kela struct {

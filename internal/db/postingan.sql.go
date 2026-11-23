@@ -71,7 +71,7 @@ func (q *Queries) CreatePengumpulanTugas(ctx context.Context, arg CreatePengumpu
 
 const createPostingan = `-- name: CreatePostingan :one
 INSERT INTO postingan (judul, deskripsi, lampiran, tipe_id, pengguna_id, kelas_id, tenggat_waktu)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+VALUES ($1, $2, $3, $4, $5, $6, $7::timestamp)
 RETURNING id, judul, deskripsi, lampiran, pengguna_id, kelas_id, tipe_id, dibuat, menerima_kiriman, tenggat_waktu
 `
 
@@ -120,20 +120,6 @@ func (q *Queries) DeletePengumpulanByPostinganID(ctx context.Context, postinganI
 	return err
 }
 
-const deletePostingan = `-- name: DeletePostingan :execrows
-DELETE FROM postingan WHERE id = $1 AND kelas_id = $2
-`
-
-type DeletePostinganParams struct {
-	ID      int32 `json:"id"`
-	KelasID int32 `json:"kelas_id"`
-}
-
-func (q *Queries) DeletePostingan(ctx context.Context, arg DeletePostinganParams) (int64, error) {
-	result, err := q.db.Exec(ctx, deletePostingan, arg.ID, arg.KelasID)
-	return result.RowsAffected(), err
-}
-
 const deletePengumpulanTugas = `-- name: DeletePengumpulanTugas :many
 DELETE FROM pengumpulan_tugas
 WHERE postingan_id = $1 AND pengguna_id = $2
@@ -170,6 +156,23 @@ func (q *Queries) DeletePengumpulanTugas(ctx context.Context, arg DeletePengumpu
 		return nil, err
 	}
 	return items, nil
+}
+
+const deletePostingan = `-- name: DeletePostingan :execrows
+DELETE FROM postingan WHERE id = $1 AND kelas_id = $2
+`
+
+type DeletePostinganParams struct {
+	ID      int32 `json:"id"`
+	KelasID int32 `json:"kelas_id"`
+}
+
+func (q *Queries) DeletePostingan(ctx context.Context, arg DeletePostinganParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deletePostingan, arg.ID, arg.KelasID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const getPengumpulanTugas = `-- name: GetPengumpulanTugas :one
@@ -435,10 +438,10 @@ SET
     deskripsi = $4,
     lampiran = COALESCE($5, lampiran),
     tipe_id = $6,
-    menerima_kiriman = COALESCE($7, menerima_kiriman),
+    menerima_kiriman = COALESCE($7::boolean, menerima_kiriman),
     tenggat_waktu = CASE
         WHEN $8::boolean THEN NULL
-        ELSE COALESCE($9, tenggat_waktu)
+        ELSE COALESCE($9::timestamp, tenggat_waktu)
     END
 WHERE id = $1 AND kelas_id = $2
 RETURNING id, judul, deskripsi, lampiran, pengguna_id, kelas_id, tipe_id, dibuat, menerima_kiriman, tenggat_waktu
